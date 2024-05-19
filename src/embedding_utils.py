@@ -2,15 +2,29 @@
 
 import os
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import WebBaseLoader,  PyMuPDFLoader, TextLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
+
 
 # Instantiate the Embedding Model
 embed_model = FastEmbedEmbeddings(model_name="BAAI/bge-base-en-v1.5")
 
+# Function to load documents from the "upload" folder
+def load_local_documents(folder_path):
+    docs = []
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if filename.endswith(".pdf"):
+            loader = PyMuPDFLoader(file_path)
+            docs.extend(loader.load())
+        elif filename.endswith(".txt"):
+            loader = TextLoader(file_path)
+            docs.extend(loader.load())
+    return docs
+
 # Function to download and process documents
-def process_documents(urls):
+def process_documents(urls, folder_path):
     docs = []
     for url in urls:
         try:
@@ -18,6 +32,11 @@ def process_documents(urls):
         except Exception as e:
             print(f"Error loading {url}: {e}")
     docs_list = [item for sublist in docs for item in sublist]
+    
+    # Load local documents from the "upload" folder
+    local_docs = load_local_documents(folder_path)
+    docs_list.extend(local_docs)
+    
     return docs_list
 
 # Function to chunk documents
@@ -49,8 +68,8 @@ def get_retriever(vectorstore):
         return None
 
 # Main function to handle embedding process
-def setup_embedding(urls):
-    docs_list = process_documents(urls)
+def setup_embedding(urls, folder_path):
+    docs_list = process_documents(urls, folder_path)
     if not docs_list:
         print("No documents were loaded.")
         return None

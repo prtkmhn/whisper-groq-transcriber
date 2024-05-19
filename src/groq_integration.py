@@ -47,14 +47,18 @@ save_json(data_path, {})
 data = load_json(data_path)
 
 # URLs for documents
+# URLs for documents
 urls = [
     "https://prateekmohan.vercel.app/",
-    "https://www.gameleap.com/articles/apex-legends-season-21-best-legends-tier-list",
-    "https://www.ign.com/articles/apex-legends-alter-abilities-and-all-season-21-update-details",
+    "https://github.com/prtkmhn",
+    "https://prateekmohan.vercel.app/about",
 ]
 
+# Path to the folder containing PDFs and text files
+folder_path = os.path.join('src', 'upload')
+
 # Setup embedding and retriever
-retriever = setup_embedding(urls)
+retriever = setup_embedding(urls, folder_path)
 if not retriever:
     print("Failed to setup embedding and retriever.")
     exit(1)
