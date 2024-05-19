@@ -1,4 +1,3 @@
-# src/main.py
 import json
 import os
 import queue
@@ -10,7 +9,7 @@ import pyperclip
 from pynput.keyboard import Controller
 from transcription import create_local_model, record_and_transcribe
 from status_window import StatusWindow
-from groq_integration import get_groq_response  # Import the new Groq integration
+from groq_integration import get_groq_response, send_latest_text_to_groq  # Import the new Groq integration
 
 class ResultThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -74,14 +73,12 @@ def clear_status_queue():
         except queue.Empty:
             break
 
-
 def stop_recording():
     global recording_thread
     if recording_thread and recording_thread.is_alive():
         recording_thread.stop()
         recording_thread.join()
         print("Recording stopped.")
-
 
 def on_shortcut():
     global status_queue, local_model, recording_thread, status_window
@@ -122,8 +119,9 @@ def on_shortcut():
     # Ensure the recording stops and re-enable the shortcut after Groq response
     keyboard.remove_hotkey(config['activation_key'])
     keyboard.add_hotkey(config['activation_key'], on_shortcut)
-    
+
 def typewrite(text, interval):
+    global recording_thread
     for letter in text:
         if recording_thread.stop_transcription:  # Check if the transcription was stopped
             break
@@ -134,8 +132,10 @@ def typewrite(text, interval):
 def format_keystrokes(key_string):
     return '+'.join(word.capitalize() for word in key_string.split('+'))
 
-
-
+def on_groq_shortcut():
+    response = send_latest_text_to_groq()
+    typewrite(response, interval=config['writing_key_press_delay'])
+    
 # Main script
 
 config = load_config_with_defaults()
@@ -166,6 +166,7 @@ pyinput_keyboard = Controller()
 keyboard.add_hotkey(config['activation_key'], on_shortcut)
 keyboard.add_hotkey('ctrl+alt+space', on_shortcut)  # Add new hotkey for Groq integration
 keyboard.add_hotkey('alt+c', stop_recording)  # Add hotkey to stop recording
+keyboard.add_hotkey('ctrl+alt+v', on_groq_shortcut)  # Add hotkey to paste clipboard content
 
 try:
     keyboard.wait()  # Keep the script running to listen for the shortcut

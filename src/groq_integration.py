@@ -1,5 +1,3 @@
-# groq_integration.py
-
 import os
 import json
 from groq import Groq
@@ -56,7 +54,6 @@ urls = [
 ]
 
 # Setup embedding and retriever
-# Setup embedding and retriever
 retriever = setup_embedding(urls)
 if not retriever:
     print("Failed to setup embedding and retriever.")
@@ -92,6 +89,12 @@ def get_groq_response(query):
         max_tokens=100  # Limit the response to a maximum of 100 tokens
     )
     return chat_completion.choices[0].message.content
+
+def send_latest_text_to_groq():
+    clipboard_content = pyperclip.paste()
+    response = get_groq_response(clipboard_content)
+    print(response)
+    return response
 
 # Main function to run the bot
 def main():
