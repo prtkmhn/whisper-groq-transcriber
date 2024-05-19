@@ -1,0 +1,57 @@
+Prateek Mohan
+pmohan9@asu.edu — (602) 515-5352 — Tempe, AZ — LinkedIn: linkedin.com/in/atprateekmohan/
+PROFILE
+Experienced Software Engineer with a comprehensive background in Cloud Computing and familiarity with Machine Learning. Proven ability to
+develop innovative solutions by utilizing software engineering standards, cloud technologies, and big data. Pursuing a Master’s degree in Computer
+Science at Arizona State University to further develop skills in software engineering, cloud services, and data analysis. Keen to apply problem-solving
+skills, technical knowledge, and teamwork to drive organizational success.
+EDUCATION
+1. Master of Computer Science — Arizona State University Aug 2022 - May 2024
+2. Bachelor of Technology, Computer Science and Engineering — PES University, Bangalore, KA, India Jul 2015 - Aug 2019
+WORK EXPERIENCE
+1. Software Engineer II — VMware Inc., India Jul 2019 - Jul 2022
+• Pioneered the automation of vSphere deployments by harnessing VMware’s proprietary APIs, achieving a streamlined infrastructure setup
+process that resulted in a 90% reduction in deployment timeframes for vCenters, ESXi hosts, and various storage systems including VMFS,
+vSAN, NFS, and VVols.
+• Engineered and refined Kubernetes setups on VMware vSphere, leading to a 30% quicker deployment via automation and CI/CD pipeline
+improvements. This also resulted in a 75% reduction in rollback occurrences, attributed to enhanced testing and quality checks.
+• Orchestrated the seamless integration of VMware vSphere Container Storage Plug-in with Kubernetes, delivering a 35% increase in storage
+efficiency and a 20% cost reduction. My technical expertise also halved incident resolution times and reinforced system reliability, ensuring
+high availability and performance.
+2. Software Engineering I — VMware Inc., India Jan 2019 - Jul 2019
+• Created a Java-based validation tool for vSphere datacenter configurations, enhancing layout accuracy by 62% and conserving over 20 hours
+per week previously spent on manual checks.
+• Conducted a thorough analysis and refinement of data center lifecycle management processes, leading to a 15% savings in storage resource
+allocation and a 25% faster resource deployment.
+• Employed Tanzu Observability by Wavefront for in-depth analytics on vSphere infrastructure, enhancing monitoring efficiency by 45% and
+accelerating performance troubleshooting by 50%.
+3. Research Intern — University of California, Irvine, CA Jul 2018 - Aug 2018
+• Architected a real-time Environmental Health Monitoring system by integrating disparate environmental data streams, including CO, NO2,
+O3, PM2.5, PM10, and SO2 levels, into a unified health metric dashboard powered by Open Street Maps API. This innovative solution enables
+immediate monitoring and data-driven decision-making for personalized respiratory and cardiovascular health during outdoor exercise events.
+• Optimized data collection using cutting-edge API technology, such as the Strava Data API, reducing data inconsistencies by 27% and improving
+accuracy by 35%. Integrated heart rate data for precise breathing volume estimation, mapped with local air quality sensors via constant GPS
+tracking.
+• Developed a novel cigarette intake equivalent metric by analyzing air pollution data and individual breathing rates, contributing to improved
+public health research.The methodology and results are documented in a research paper available on arXiv.
+RELEVANT PROJECTS
+• Fetal Monitoring System - Cloud Computing and Big Data (PES University): Designed a low-cost fetal monitoring system using cloud
+solutions, achieving 98% cost reduction and 96% accuracy. Utilized machine learning algorithms for fetal heartbeat detection and signal processing.
+Secured patent approval from the Indian Patent Office, with the Patent Certificate accessible through their database.
+• Indoor Positioning System (PES University): Developed algorithms for Android phones that transformed sensor data into precise location
+data with 92% accuracy, enabling a hospital-based indoor positioning system. Employed deep learning techniques like LSTMs for sensor fusion,
+location estimation, and trajectory prediction. This work has been published by Springer.
+• Depth Sensing Mono Camera (Huawei Club, PES University): Formulated a depth-sensing mono-camera program using Capsule neural
+networks for accurate depth estimation from monocular images. Applied advanced computer vision and deep learning techniques for 3D reconstruction, depth map generation, and transfer learning.
+SKILLS
+• Cloud Computing: AWS, GCP, Azure, Kubernetes, Docker, Service Mesh, Serverless Architecture, Microservices, DevOps, Architecture
+• Data Science: Python, SQL, Pandas, NumPy, SciPy, Scikit-learn, TensorFlow, PyTorch, Keras, Hadoop, Data Visualization, Data Analytics,
+Machine Learning, Deep Learning, NLP, CV, Statistics, Signal Processing, Neural Networks, Model Optimization, Data Visualization
+• Software Development: Java, Python, JavaScript (Flask), RESTful APIs, CI/CD, Agile Development, Design Patterns, Design, Linux/Unix,
+Code Reviews, Prototyping from Ideas and Wireframes, Data structures, Algorithms, UX/UI, web services
+• Virtualization: VMware, Hyper-V, KVM, Xen, VirtualBox
+• Database Technologies: SQL, MySQL, PostgreSQL
+• Integration and Engineering: Implemented innovative solutions and engineered systems for optimal integration
+• Additional Skills: Agile Methodologies, Git, API Development, Unit Testing, Version Control, Web Development, C++, C, Object-Oriented
+Programming (OOP),CSS , HTML, Debugging, Security, Software Architecture, Software Testing, Scrum, Communication, Problem-Solving, Critical
+Thinking, Adaptability, Time Management, Leadership

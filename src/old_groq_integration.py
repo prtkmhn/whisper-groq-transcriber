@@ -10,12 +10,12 @@ client = Groq(
     api_key=os.environ.get("GROQ_API_KEY"),
 )
 
-# Load resume content
-def load_resume(file_path):
+# Load resume content from resume.json (read-only)
+def load_resume_json(file_path):
     with open(file_path, 'r') as file:
-        return file.read()
+        return json.load(file)
 
-resume_content = load_resume(os.path.join('src', 'resume.txt'))
+resume_json = load_resume_json(os.path.join('src', 'resume.json'))
 
 # Load JSON file
 def load_json(file_path):
@@ -30,74 +30,37 @@ def save_json(file_path, data):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=2)
 
-# JSON file path
-json_file_path = os.path.join('src', 'data.json')
+# JSON file paths
+data_path = os.path.join('src', 'data.json')
 
-if not os.path.exists(json_file_path):
-    save_json(json_file_path, {})
+# Clear data.json at the start of the code
+save_json(data_path, {})
 
 # Load JSON data
-json_data = load_json(json_file_path)
+data = load_json(data_path)
 
-# Update JSON data with resume content
-json_data['resume'] = resume_content
-
-# Save updated JSON data
-save_json(json_file_path, json_data)
-
-def summarize_context(context):
-    if len(context.split()) > 200:
-        messages = [
-            {
-                "role": "system",
-                "content": "You are an AI assistant that summarizes long text into a concise summary.",
-            },
-            {
-                "role": "user",
-                "content": f"Please summarize the following text:\n\n{context}",
-            }
-        ]
-        response = client.chat.completions.create(
-            model="llama3-8b-8192",
-            messages=messages,
-            max_tokens=100
-        )
-        return response.choices[0].message.content
-    else:
-        return context
-
-def update_json(key, value):
-    json_data = load_json(json_file_path)
-    json_data[key] = value
-    save_json(json_file_path, json_data)
+# Update JSON data with a key-value pair
+def update_json(file_path, key, value):
+    data = load_json(file_path)
+    data[key] = value
+    save_json(file_path, data)
 
 def get_groq_response(query):
-    # Check if the query contains 'clipboard' or 'clip board'
-    if 'clipboard' in query.lower() or 'clip board' in query.lower():
+    # Check if the query contains 'update <KEYWORD>'
+    if 'update' in query.lower():
+        keyword = query.lower().split('update')[1].strip()
         clipboard_content = pyperclip.paste()
-        query = query.replace('clipboard', clipboard_content).replace('clip board', clipboard_content)
-    
-    # Check if the query contains 'check my clipboard history'
-    if 'check my clipboard history' in query.lower():
-        clipboard_content = pyperclip.paste()
-        summarized_content = summarize_context(clipboard_content)
-        update_json(summarized_content)
-        update_json('Clipboard Details', summarized_content)
-
-    if 'job description' in query.lower() or 'history' in query.lower():
-        clipboard_content = pyperclip.paste()
-        summarized_content = summarize_context(clipboard_content)
-        update_json('job_description', summarized_content)
-    
+        update_json(data_path, keyword, clipboard_content)
+        return f"Updated {keyword} in data.json with the content from the clipboard."
     
     # Load JSON data
-    json_data = load_json(json_file_path)
+    json_data = load_json(data_path)
     
     chat_completion = client.chat.completions.create(
         messages=[
             {
                 "role": "system",
-                "content": "You are an AI assistant that helps with job applications. Keep the answer short and under 20 words and write like the user himself. Please make sure to not sound like an AI. Here is the user's data: " + json.dumps(json_data),
+                "content": "You are an AI assistant that helps with job applications.  YOU will answer any question as If I was answering it myself. Make sure that none of your response have any buffer text and shouldnt sounud AI generated. Answer directly and to the point, as if you were the user. Here is the user resume content: " + json.dumps(resume_json) + "Here is the user's data: " + json.dumps(json_data),
             },
             {
                 "role": "user",
@@ -108,3 +71,13 @@ def get_groq_response(query):
         max_tokens=100  # Limit the response to a maximum of 100 tokens
     )
     return chat_completion.choices[0].message.content
+
+# Main function to run the bot
+def main():
+    query = "Your query here"
+    response = get_groq_response(query)
+    print(response)
+
+# Run the main function
+if __name__ == "__main__":
+    main()
