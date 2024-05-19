@@ -1,0 +1,80 @@
+{
+  "profile": {
+    "name": "Prateek Mohan",
+    "email": "pmohan9@asu.edu",
+    "phone": "(602) 515-5352",
+    "location": "Tempe, AZ",
+    "linkedin": "linkedin.com/in/atprateekmohan/",
+    "summary": "Experienced Software Engineer with a comprehensive background in Cloud Computing and familiarity with Machine Learning. Proven ability to develop innovative solutions by utilizing software engineering standards, cloud technologies, and big data."
+  },
+  "education": [
+    {
+      "degree": "Master of Computer Science",
+      "institution": "Arizona State University",
+      "duration": "Aug 2022 - May 2024"
+    },
+    {
+      "degree": "Bachelor of Technology, Computer Science and Engineering",
+      "institution": "PES University, Bangalore, KA, India",
+      "duration": "Jul 2015 - Aug 2019"
+    }
+  ],
+  "workExperience": [
+    {
+      "role": "Software Engineer II",
+      "company": "VMware Inc., India",
+      "duration": "Jul 2019 - Jul 2022",
+      "achievements": [
+        "Pioneered the automation of vSphere deployments, achieving a 90% reduction in deployment timeframes",
+        "Engineered and refined Kubernetes setups on VMware vSphere, leading to a 30% quicker deployment",
+        "Orchestrated the seamless integration of VMware vSphere Container Storage Plug-in with Kubernetes, delivering a 35% increase in storage efficiency and a 20% cost reduction"
+      ]
+    },
+    {
+      "role": "Software Engineering I",
+      "company": "VMware Inc., India",
+      "duration": "Jan 2019 - Jul 2019",
+      "achievements": [
+        "Created a Java-based validation tool for vSphere datacenter configurations, enhancing layout accuracy by 62%",
+        "Conducted a thorough analysis and refinement of data center lifecycle management processes, leading to a 15% savings in storage resource allocation",
+        "Employed Tanzu Observability by Wavefront for in-depth analytics on vSphere infrastructure, enhancing monitoring efficiency by 45% and accelerating performance troubleshooting by 50%"
+      ]
+    },
+    {
+      "role": "Research Intern",
+      "company": "University of California, Irvine, CA",
+      "duration": "Jul 2018 - Aug 2018",
+      "achievements": [
+        "Architected a real-time Environmental Health Monitoring system by integrating disparate environmental data streams",
+        "Optimized data collection using cutting-edge API technology, reducing data inconsistencies by 27% and improving accuracy by 35%",
+        "Developed a novel cigarette intake equivalent metric by analyzing air pollution data and individual breathing rates"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Fetal Monitoring System",
+      "description": "Designed a low-cost fetal monitoring system using cloud solutions, achieving 98% cost reduction and 96% accuracy"
+    },
+    {
+      "name": "Indoor Positioning System",
+      "description": "Developed algorithms for Android phones that transformed sensor data into precise location data with 92% accuracy"
+    },
+    {
+      "name": "Depth Sensing Mono Camera",
+      "description": "Formulated a depth-sensing mono-camera program using Capsule neural networks for accurate depth estimation from monocular images"
+    }
+  ],
+  "skills": {
+    "cloudComputing": ["AWS", "GCP", "Azure", "Kubernetes", "Docker", "Service Mesh", "Serverless Architecture", "Microservices", "DevOps", "Architecture"],
+    "dataScience": ["Python", "SQL", "Pandas", "NumPy", "SciPy", "Scikit-learn", "TensorFlow", "PyTorch", "Keras", "Hadoop", "Data Visualization", "Data Analytics", "Machine Learning", "Deep Learning", "NLP", "CV", "Statistics", "Signal Processing", "Neural Networks", "Model Optimization", "Data Visualization"],
+    "softwareDevelopment": ["Java", "Python", "JavaScript (Flask)", "RESTful APIs", "CI/CD", "Agile Development", "Design Patterns", "Design", "Linux/Unix", "Code Reviews", "Prototyping from Ideas and Wireframes", "Data structures", "Algorithms", "UX/UI", "web services"],
+    "virtualization": ["VMware", "Hyper-V", "KVM", "Xen", "VirtualBox"],
+    "databaseTechnologies": ["SQL", "MySQL", "PostgreSQL"],
+    "integrationAndEngineering": ["Implemented innovative solutions and engineered systems for optimal integration"],
+    "additionalSkills": ["Agile Methodologies", "Git", "API Development", "Unit Testing", "Version Control", "Web Development", "C++", "C", "Object-Oriented Programming (OOP)", "CSS", "HTML", "Debugging", "Security", "Software Architecture", "Software Testing", "Scrum", "Communication", "Problem-Solving", "Critical Thinking", "Adaptability", "Time Management", "Leadership"]
+  }
+}
+
+
+

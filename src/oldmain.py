@@ -158,14 +158,14 @@ elif config['recording_mode'] == 'press_to_toggle':
     print(' When it is pressed, recording will start, and will stop when you press the key combo again.')
 elif config['recording_mode'] == 'hold_to_record':
     print(' When it is pressed, recording will start, and will stop when you release the key combo.')
-print('Press alt+C on the terminal window to quit.')
+print('Press Ctrl+C on the terminal window to quit.')
 
 # Set up status window and keyboard listener
 status_queue = queue.Queue()
 pyinput_keyboard = Controller()
 keyboard.add_hotkey(config['activation_key'], on_shortcut)
 keyboard.add_hotkey('ctrl+alt+space', on_shortcut)  # Add new hotkey for Groq integration
-keyboard.add_hotkey('alt+c', stop_recording)  # Add hotkey to stop recording
+keyboard.add_hotkey('ctrl+c', stop_recording)  # Add hotkey to stop recording
 
 try:
     keyboard.wait()  # Keep the script running to listen for the shortcut

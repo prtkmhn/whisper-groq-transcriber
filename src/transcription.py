@@ -10,7 +10,7 @@ from faster_whisper import WhisperModel
 from openai import OpenAI
 import keyboard
 import torch
-
+import keyboard
 
 """
 Create a local model using the faster_whisper library.
