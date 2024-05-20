@@ -17,8 +17,8 @@ Whisper-Groq-Transcriber is a speech-to-text application that uses [OpenAI's Whi
 1. **Start Recording**: Use the default keyboard shortcut (`ctrl+shift+space`) to start recording.
 2. **Stop Recording**: Choose from voice activity detection, press-to-toggle, or hold-to-record modes.
 3. **Transcription**: The transcribed text will be automatically written to the active window.
-4. **Send Text from Clipboard** : Press Ctrl+alt+v sends the last clipboard history as a Prompt to the Groq Agent
-5. **Update Context** : When the user says Update <Keywords>, groq creates a json file with the keyword as json key and the clipboard content as it's value, this can be use to provide context to the Groq
+4. **Send Text from Clipboard**: Pressing `Ctrl+Alt+V` sends the last item from the clipboard history as a prompt to the Groq Agent.
+5. **Update Context**: When the user says "Update" followed by <Keywords>, Groq creates a JSON file with the keyword as the JSON key and the clipboard content as its value, which can be used to provide context to Groq.
 
 ## Additional Functionality
 
@@ -27,6 +27,7 @@ The integration with Groq allows for advanced handling of JSON data and respondi
 ## Getting Started
 
 For detailed setup instructions, please refer to the original [Whisper-Readme.md](https://github.com/savbell/whisper-writer).
+
 
 ## Credits
 
