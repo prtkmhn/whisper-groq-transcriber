@@ -9,7 +9,7 @@ import pyperclip
 from pynput.keyboard import Controller
 from transcription import create_local_model, record_and_transcribe
 from status_window import StatusWindow
-from groq_integration import get_groq_response, send_latest_text_to_groq  # Import the new Groq integration
+from groq_integration import get_groq_response, send_latest_text_to_groq, update_json  # Import the new Groq integration
 
 class ResultThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -135,7 +135,27 @@ def format_keystrokes(key_string):
 def on_groq_shortcut():
     response = send_latest_text_to_groq()
     typewrite(response, interval=config['writing_key_press_delay'])
-    
+
+def setup_dynamic_hotkeys():
+    dynamic_hotkeys = {}
+    while True:
+        hotkey_name = input("Enter the name for the new hotkey (or press Enter to finish): ")
+        if not hotkey_name:
+            break
+        hotkey_combination = input(f"Enter the hotkey combination for '{hotkey_name}' (or press Enter to skip): ")
+        if not hotkey_combination:
+            print(f"Skipping '{hotkey_name}'")
+            continue
+        dynamic_hotkeys[hotkey_name] = hotkey_combination
+        keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: save_clipboard_to_json(name))
+        print(f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully.")
+    return dynamic_hotkeys
+
+def save_clipboard_to_json(hotkey_name):
+    clipboard_content = pyperclip.paste()
+    update_json(os.path.join('src', 'data.json'), hotkey_name, clipboard_content)
+    print(f"Saved clipboard content to '{hotkey_name}' in data.json")
+
 # Main script
 
 config = load_config_with_defaults()
@@ -167,6 +187,9 @@ keyboard.add_hotkey(config['activation_key'], on_shortcut)
 keyboard.add_hotkey('ctrl+alt+space', on_shortcut)  # Add new hotkey for Groq integration
 keyboard.add_hotkey('alt+c', stop_recording)  # Add hotkey to stop recording
 keyboard.add_hotkey('ctrl+alt+v', on_groq_shortcut)  # Add hotkey to paste clipboard content
+
+# Set up dynamic hotkeys
+dynamic_hotkeys = setup_dynamic_hotkeys()
 
 try:
     keyboard.wait()  # Keep the script running to listen for the shortcut

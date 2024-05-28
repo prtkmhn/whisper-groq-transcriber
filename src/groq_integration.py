@@ -47,7 +47,6 @@ save_json(data_path, {})
 data = load_json(data_path)
 
 # URLs for documents
-# URLs for documents
 urls = [
     "https://prateekmohan.vercel.app/",
     "https://github.com/prtkmhn",
