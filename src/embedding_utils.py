@@ -1,11 +1,10 @@
-#src/embedding_utils.py
+# src/embedding_utils.py
 
 import os
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import WebBaseLoader,  PyMuPDFLoader, TextLoader
+from langchain_community.document_loaders import WebBaseLoader, PyMuPDFLoader, TextLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
-
 
 # Instantiate the Embedding Model
 embed_model = FastEmbedEmbeddings(model_name="BAAI/bge-base-en-v1.5")

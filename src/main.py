@@ -9,8 +9,14 @@ from audioplayer import AudioPlayer
 from pynput.keyboard import Controller
 from transcription import create_local_model, record_and_transcribe
 from status_window import StatusWindow
-from groq_integration import get_groq_response, send_latest_text_to_groq, update_json  # Import the new Groq integration
+from groq_integration import get_groq_response, send_latest_text_to_groq, update_json, set_model, setup_embedding  # Import the new Groq integration
 import gradio as gr
+
+# Global variables for chat history, selected model, and dynamic URLs
+chat_history = []
+selected_model = "llama3-8b-8192"
+dynamic_urls = []
+folder_path = os.path.join('src', 'upload')  # Define folder_path globally
 
 class ResultThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -124,7 +130,7 @@ def on_shortcut():
 def typewrite(text, interval):
     global recording_thread
     for letter in text:
-        if recording_thread.stop_transcription:  # Check if the transcription was stopped
+        if recording_thread and recording_thread.stop_transcription:  # Check if the transcription was stopped
             break
         pyinput_keyboard.press(letter)
         pyinput_keyboard.release(letter)
@@ -192,8 +198,31 @@ def create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type)
     return f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully."
 
 def chat_with_bot(query):
+    global chat_history
     response = generate_answer(query)
-    return response
+    chat_history.append((query, response))
+    return chat_history, f"Model: {selected_model}\nURLs: {', '.join(dynamic_urls)}"
+
+def add_url(url):
+    global dynamic_urls, retriever
+    dynamic_urls.append(url)
+    retriever = setup_embedding(dynamic_urls, folder_path)
+    return f"URL '{url}' added successfully."
+
+def upload_pdf(pdf):
+    global retriever
+    pdf_path = os.path.join(folder_path, pdf.name)
+    with open(pdf_path, "wb") as f:
+        f.write(pdf.read())
+    retriever = setup_embedding(dynamic_urls, folder_path)
+    return f"PDF '{pdf.name}' uploaded successfully."
+
+def set_model_and_retriever(model_name):
+    global selected_model, retriever
+    selected_model = model_name
+    set_model(model_name)
+    retriever = setup_embedding(dynamic_urls, folder_path)
+    return f"Model set to {model_name} and retriever updated."
 
 # Main script
 
@@ -234,6 +263,17 @@ dynamic_hotkeys = setup_dynamic_hotkeys()
 with gr.Blocks() as demo:
     gr.Markdown("# WhisperWriter with Gradio UI")
     
+    with gr.Tab("Chat with Bot"):
+        model_selector = gr.Dropdown(["llama3-8b-8192", "llama3-70b-8192", "mixtral-8x7b-32768"], label="Select Model", value="llama3-8b-8192")
+        model_selector.change(set_model_and_retriever, inputs=model_selector, outputs=None)
+        
+        initial_prompt = gr.Textbox(label="Initial Prompt", placeholder="Enter initial prompt for the chatbot...")
+        chat_output = gr.Chatbot(label="Chat History")
+        query = gr.Textbox(label="Your Query", placeholder="Type your message here...")
+        chat_button = gr.Button("Chat")
+        
+        chat_button.click(chat_with_bot, inputs=[query], outputs=[chat_output, gr.Textbox(label="Details")])
+    
     with gr.Tab("Create Hotkey"):
         hotkey_name = gr.Textbox(label="Hotkey Name")
         hotkey_combination = gr.Textbox(label="Hotkey Combination")
@@ -244,12 +284,18 @@ with gr.Blocks() as demo:
         
         create_button.click(create_hotkey, inputs=[hotkey_name, hotkey_combination, post_processing, action_type], outputs=create_output)
     
-    with gr.Tab("Chat with Bot"):
-        query = gr.Textbox(label="Your Query")
-        chat_button = gr.Button("Chat")
-        chat_output = gr.Textbox(label="Bot's Reply")
+    with gr.Tab("Add URL"):
+        url_input = gr.Textbox(label="Enter URL")
+        add_url_button = gr.Button("Add URL")
+        add_url_output = gr.Textbox(label="Output")
         
-        chat_button.click(chat_with_bot, inputs=query, outputs=chat_output)
+        add_url_button.click(add_url, inputs=url_input, outputs=add_url_output)
+        
+        pdf_input = gr.File(label="Upload PDF")
+        upload_pdf_button = gr.Button("Upload PDF")
+        upload_pdf_output = gr.Textbox(label="Output")
+        
+        upload_pdf_button.click(upload_pdf, inputs=pdf_input, outputs=upload_pdf_output)
 
 demo.launch()
 

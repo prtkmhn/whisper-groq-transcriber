@@ -7,9 +7,17 @@ from embedding_utils import setup_embedding
 
 load_dotenv()
 
+# Global variable for selected model
+selected_model = "llama3-8b-8192"
+
 client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
+    api_key=os.environ.get("GROQ_API_KEY")
 )
+
+# Function to set the model
+def set_model(model_name):
+    global selected_model
+    selected_model = model_name
 
 # Load JSON file
 def load_json(file_path):
@@ -81,14 +89,14 @@ def get_groq_response(query):
         messages=[
             {
                 "role": "system",
-                "content": "You are an AI assistant that helps with job applications. YOU will answer any question as If I was answering it myself. Make sure that none of your response have any buffer text and shouldn't sound AI generated. Answer directly and to the point, as if you were the user. Here is the user's data: " + json.dumps(json_data) + "Here is the context: " + context,
+                "content": "You are an AI assistant that hel:ps with job applications. YOU will answer any question as If I was answering it myself. Make sure that none of your response have any buffer text and shouldn't sound AI generated. Answer directly and to the point, as if you were the user. Here is the user's data " + json.dumps(json_data) + "Here is the context: " + context,
             },
             {
                 "role": "user",
                 "content": query,
             }
         ],
-        model="llama3-8b-8192",
+        model=selected_model,
         max_tokens=100  # Limit the response to a maximum of 100 tokens
     )
     return chat_completion.choices[0].message.content
