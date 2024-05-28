@@ -4,12 +4,13 @@ import queue
 import threading
 import time
 import keyboard
-from audioplayer import AudioPlayer
 import pyperclip
+from audioplayer import AudioPlayer
 from pynput.keyboard import Controller
 from transcription import create_local_model, record_and_transcribe
 from status_window import StatusWindow
 from groq_integration import get_groq_response, send_latest_text_to_groq, update_json  # Import the new Groq integration
+import gradio as gr
 
 class ResultThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -180,6 +181,20 @@ def handle_hotkey_action(hotkey_name, dynamic_hotkeys):
 def generate_answer(query):
     return get_groq_response(query)
 
+# Gradio UI functions
+def create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type):
+    dynamic_hotkeys[hotkey_name] = {
+        'combination': hotkey_combination,
+        'post_processing': post_processing,
+        'action_type': action_type
+    }
+    keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys))
+    return f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully."
+
+def chat_with_bot(query):
+    response = generate_answer(query)
+    return response
+
 # Main script
 
 config = load_config_with_defaults()
@@ -214,6 +229,29 @@ keyboard.add_hotkey('ctrl+alt+v', on_groq_shortcut)  # Add hotkey to paste clipb
 
 # Set up dynamic hotkeys
 dynamic_hotkeys = setup_dynamic_hotkeys()
+
+# Gradio UI
+with gr.Blocks() as demo:
+    gr.Markdown("# WhisperWriter with Gradio UI")
+    
+    with gr.Tab("Create Hotkey"):
+        hotkey_name = gr.Textbox(label="Hotkey Name")
+        hotkey_combination = gr.Textbox(label="Hotkey Combination")
+        post_processing = gr.Textbox(label="Post-Processing Command")
+        action_type = gr.Radio(["json", "print"], label="Action Type")
+        create_button = gr.Button("Create Hotkey")
+        create_output = gr.Textbox(label="Output")
+        
+        create_button.click(create_hotkey, inputs=[hotkey_name, hotkey_combination, post_processing, action_type], outputs=create_output)
+    
+    with gr.Tab("Chat with Bot"):
+        query = gr.Textbox(label="Your Query")
+        chat_button = gr.Button("Chat")
+        chat_output = gr.Textbox(label="Bot's Reply")
+        
+        chat_button.click(chat_with_bot, inputs=query, outputs=chat_output)
+
+demo.launch()
 
 try:
     keyboard.wait()  # Keep the script running to listen for the shortcut
