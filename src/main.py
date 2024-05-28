@@ -146,15 +146,39 @@ def setup_dynamic_hotkeys():
         if not hotkey_combination:
             print(f"Skipping '{hotkey_name}'")
             continue
-        dynamic_hotkeys[hotkey_name] = hotkey_combination
-        keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: save_clipboard_to_json(name))
+        post_processing = input(f"Enter the post-processing command for '{hotkey_name}' (or press Enter to skip): ")
+        action_type = input(f"Do you want to save the output to JSON or print it directly? (Enter 'json' or 'print'): ").strip().lower()
+        
+        dynamic_hotkeys[hotkey_name] = {
+            'combination': hotkey_combination,
+            'post_processing': post_processing,
+            'action_type': action_type
+        }
+        
+        keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys))
         print(f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully.")
     return dynamic_hotkeys
 
-def save_clipboard_to_json(hotkey_name):
+def handle_hotkey_action(hotkey_name, dynamic_hotkeys):
     clipboard_content = pyperclip.paste()
-    update_json(os.path.join('src', 'data.json'), hotkey_name, clipboard_content)
-    print(f"Saved clipboard content to '{hotkey_name}' in data.json")
+    post_processing_command = dynamic_hotkeys[hotkey_name]['post_processing']
+    action_type = dynamic_hotkeys[hotkey_name]['action_type']
+    
+    if post_processing_command:
+        query = f"{post_processing_command} {clipboard_content}"
+    else:
+        query = clipboard_content
+    
+    response = generate_answer(query)
+    
+    if action_type == 'json':
+        update_json(os.path.join('src', 'data.json'), hotkey_name, response)
+        print(f"Saved response to '{hotkey_name}' in data.json")
+    else:
+        typewrite(response, interval=config['writing_key_press_delay'])
+
+def generate_answer(query):
+    return get_groq_response(query)
 
 # Main script
 
