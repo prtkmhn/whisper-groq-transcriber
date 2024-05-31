@@ -34,13 +34,13 @@ def load_config_with_defaults():
     default_config = {
         'use_api': False,
         'api_options': {
-            'model': 'whisper-1',
+            'model': 'whisper',
             'language': None,
             'temperature': 0.0,
             'initial_prompt': None
         },
         'local_model_options': {
-            'model': 'base',
+            'model': 'small',
             'device': 'auto',
             'compute_type': 'auto',
             'language': None,
@@ -224,6 +224,12 @@ def set_model_and_retriever(model_name):
     retriever = setup_embedding(dynamic_urls, folder_path)
     return f"Model set to {model_name} and retriever updated."
 
+# New function to update JSON file
+def update_json_file(key, value):
+    file_path = os.path.join('src', 'data.json')
+    update_json(file_path, key, value)
+    return f"Updated {key} in data.json with value: {value}"
+
 # Main script
 
 config = load_config_with_defaults()
@@ -296,6 +302,15 @@ with gr.Blocks() as demo:
         upload_pdf_output = gr.Textbox(label="Output")
         
         upload_pdf_button.click(upload_pdf, inputs=pdf_input, outputs=upload_pdf_output)
+    
+    # New tab to update JSON file
+    with gr.Tab("Update JSON"):
+        json_key = gr.Textbox(label="Key", placeholder="Enter the key to update...")
+        json_value = gr.Textbox(label="Value", placeholder="Enter the value to update...")
+        update_button = gr.Button("Update JSON")
+        update_output = gr.Textbox(label="Output")
+        
+        update_button.click(update_json_file, inputs=[json_key, json_value], outputs=update_output)
 
 demo.launch()
 

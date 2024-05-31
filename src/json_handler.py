@@ -24,3 +24,13 @@ def update_json(file_path, key, value):
 def load_resume_json(file_path):
     with open(file_path, 'r') as file:
         return json.load(file)
+    
+
+def load_json_as_list(file_path):
+    data = load_json(file_path)
+    return [data] if isinstance(data, dict) else data
+
+# Function to save list of dictionaries back to JSON
+def save_list_to_json(file_path, data_list):
+    data = data_list[0] if len(data_list) == 1 else data_list
+    save_json(file_path, data)

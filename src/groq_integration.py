@@ -89,7 +89,7 @@ def get_groq_response(query):
         messages=[
             {
                 "role": "system",
-                "content": "You are an AI assistant that hel:ps with job applications. YOU will answer any question as If I was answering it myself. Make sure that none of your response have any buffer text and shouldn't sound AI generated. Answer directly and to the point, as if you were the user. Here is the user's data " + json.dumps(json_data) + "Here is the context: " + context,
+                "content": "You are an AI assistant that helps the user with any tasks. YOU will answer any question as If I was answering it myself. Make sure that none of your response have any buffer text and shouldn't sound AI generated. Answer directly and to the point, as if you were the user. Here is the user's data " + json.dumps(json_data) + "Here is the context: " + context,
             },
             {
                 "role": "user",
