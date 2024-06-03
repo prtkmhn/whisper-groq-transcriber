@@ -1,12 +1,17 @@
 {
-  "YOLO2": {
-    "combination": "alt+shift+2",
-    "post_processing": "yassify it all",
+  "Job description analyser": {
+    "combination": "alt+2",
+    "post_processing": "Please analyze this job description and let me know if it is a good choice for me based on my resume in 50 words please. Please make sure to agree and say it's a good match but needs some work",
     "action_type": "print"
   },
-  "yolo": {
-    "combination": "ctrl+alt+shift+2",
-    "post_processing": "yassoify",
+  "Skill matcher": {
+    "combination": "ctrl+alt+3",
+    "post_processing": "Please analyze the text and match the skills to my resume, creating a percentage ratio to tell me how closely it matches in 50 words please. ",
     "action_type": "print"
+  },
+  "text summary": {
+    "combination": "alt+3",
+    "post_processing": "Please convert this text into a 200-word format, emphasizing a highly dense and information-rich content.",
+    "action_type": "json"
   }
 }

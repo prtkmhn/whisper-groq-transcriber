@@ -275,7 +275,7 @@ def load_hotkeys():
     return {}
 
 # Function to update hotkeys
-def update_hotkey(hotkey_name, new_combination, new_post_processing, new_action_type):
+def update_hotkey(hotkey_name, new_combination, new_post_processing, new_action_type, config):
     dynamic_hotkeys = load_hotkeys()
     if hotkey_name in dynamic_hotkeys:
         if new_combination:
@@ -288,6 +288,9 @@ def update_hotkey(hotkey_name, new_combination, new_post_processing, new_action_
         save_hotkeys(dynamic_hotkeys)  # Save the updated hotkeys
         return f"Hotkey '{hotkey_name}' updated successfully."
     return f"Hotkey '{hotkey_name}' not found."
+
+
+
 
 
 # Function to create or update hotkeys

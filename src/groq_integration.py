@@ -56,9 +56,9 @@ data = load_json(data_path)
 
 # URLs for documents
 urls = [
-    "https://prateekmohan.vercel.app/",
-    "https://github.com/prtkmhn",
-    "https://prateekmohan.vercel.app/about",
+    "https://prateekmohan.vercel.app/" #add more websites like this
+    # "https://github.com/prtkmhn",
+    # "https://prateekmohan.vercel.app/about",
 ]
 
 # Path to the folder containing PDFs and text files
