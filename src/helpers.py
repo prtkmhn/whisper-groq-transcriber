@@ -1,16 +1,19 @@
-import json
+# helpers.py
+
 import os
+import json
 import queue
 import threading
 import time
-import keyboard
 import pyperclip
+from pynput import keyboard as pynput_keyboard
 from audioplayer import AudioPlayer
-from pynput.keyboard import Controller
 from transcription import create_local_model, record_and_transcribe
 from status_window import StatusWindow
 from groq_integration import get_groq_response, send_latest_text_to_groq, update_json, set_model, setup_embedding
 import gradio as gr
+from pynput.keyboard import Controller
+import keyboard  # Ensure keyboard is imported
 
 # Global variables for chat history, selected model, and dynamic URLs
 chat_history = []
@@ -73,23 +76,21 @@ def load_config_with_defaults():
 
     return default_config
 
-def clear_status_queue():
+def clear_status_queue(status_queue):
     while not status_queue.empty():
         try:
             status_queue.get_nowait()
         except queue.Empty:
             break
 
-def stop_recording():
-    global recording_thread
+def stop_recording(recording_thread):
     if recording_thread and recording_thread.is_alive():
         recording_thread.stop()
         recording_thread.join()
         print("Recording stopped.")
 
-def on_shortcut():
-    global status_queue, local_model, recording_thread, status_window
-    clear_status_queue()
+def on_shortcut(config, status_queue, local_model, recording_thread, status_window):
+    clear_status_queue(status_queue)
 
     status_queue.put(('recording', 'Recording...'))
     recording_thread = ResultThread(target=record_and_transcribe, 
@@ -118,17 +119,27 @@ def on_shortcut():
             transcribed_text = transcribed_text.replace('clipboard', clipboard_content).replace('clip board', clipboard_content)
         
         groq_response = get_groq_response(transcribed_text)  # Get response from Groq API
-        typewrite(groq_response, interval=config['writing_key_press_delay'])
+        typewrite(groq_response, interval=config['writing_key_press_delay'], recording_thread=recording_thread)
 
     if config['noise_on_completion']:
         AudioPlayer(os.path.join('assets', 'beep.wav')).play(block=True)
 
     # Ensure the recording stops and re-enable the shortcut after Groq response
     keyboard.remove_hotkey(config['activation_key'])
-    keyboard.add_hotkey(config['activation_key'], on_shortcut)
+    keyboard.add_hotkey(config['activation_key'], lambda: on_shortcut(config, status_queue, local_model, recording_thread, status_window))
 
-def typewrite(text, interval):
-    global recording_thread
+# Function to capture selected text
+def get_selected_text():
+    with pynput_keyboard.Controller() as controller:
+        controller.press(pynput_keyboard.Key.ctrl)
+        controller.press('c')
+        controller.release('c')
+        controller.release(pynput_keyboard.Key.ctrl)
+    time.sleep(0.1)  # Wait for clipboard to update
+    return pyperclip.paste()
+
+def typewrite(text, interval, recording_thread=None):
+    pyinput_keyboard = Controller()  # Define pyinput_keyboard here
     for letter in text:
         if recording_thread and recording_thread.stop_transcription:  # Check if the transcription was stopped
             break
@@ -139,11 +150,34 @@ def typewrite(text, interval):
 def format_keystrokes(key_string):
     return '+'.join(word.capitalize() for word in key_string.split('+'))
 
-def on_groq_shortcut():
+def on_groq_shortcut(config):
     response = send_latest_text_to_groq()
     typewrite(response, interval=config['writing_key_press_delay'])
 
-def handle_hotkey_action(hotkey_name, dynamic_hotkeys):
+def setup_dynamic_hotkeys(config):
+    dynamic_hotkeys = {}
+    while True:
+        hotkey_name = input("Enter the name for the new hotkey (or press Enter to finish): ")
+        if not hotkey_name:
+            break
+        hotkey_combination = input(f"Enter the hotkey combination for '{hotkey_name}' (or press Enter to skip): ")
+        if not hotkey_combination:
+            print(f"Skipping '{hotkey_name}'")
+            continue
+        post_processing = input(f"Enter the post-processing command for '{hotkey_name}' (or press Enter to skip): ")
+        action_type = input(f"Do you want to save the output to JSON or print it directly? (Enter 'json' or 'print'): ").strip().lower()
+        
+        dynamic_hotkeys[hotkey_name] = {
+            'combination': hotkey_combination,
+            'post_processing': post_processing,
+            'action_type': action_type
+        }
+        
+        keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
+        print(f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully.")
+    return dynamic_hotkeys
+
+def handle_hotkey_action(hotkey_name, dynamic_hotkeys, config):
     clipboard_content = pyperclip.paste()
     post_processing_command = dynamic_hotkeys[hotkey_name]['post_processing']
     action_type = dynamic_hotkeys[hotkey_name]['action_type']
@@ -165,31 +199,36 @@ def generate_answer(query):
     return get_groq_response(query)
 
 # Gradio UI functions
-def create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type):
-    if 'dynamic_hotkeys' not in globals():
-        global dynamic_hotkeys
-        dynamic_hotkeys = {}
+def create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type, dynamic_hotkeys, config):
     dynamic_hotkeys[hotkey_name] = {
         'combination': hotkey_combination,
         'post_processing': post_processing,
         'action_type': action_type
     }
-    keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys))
+    keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
     return f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully."
 
-def chat_with_bot(query):
+def chat_with_bot(query, config):
     global chat_history
     response = generate_answer(query)
     chat_history.append((query, response))
     return chat_history, f"Model: {selected_model}\nURLs: {', '.join(dynamic_urls)}"
 
-def add_url(url):
+def add_url(url, config):
     global dynamic_urls, retriever
     dynamic_urls.append(url)
     retriever = setup_embedding(dynamic_urls, folder_path)
     return f"URL '{url}' added successfully."
 
-def set_model_and_retriever(model_name):
+def upload_pdf(pdf, config):
+    global retriever
+    pdf_path = os.path.join(folder_path, pdf.name)
+    with open(pdf_path, "wb") as f:
+        f.write(pdf.read())
+    retriever = setup_embedding(dynamic_urls, folder_path)
+    return f"PDF '{pdf.name}' uploaded successfully."
+
+def set_model_and_retriever(model_name, config):
     global selected_model, retriever
     selected_model = model_name
     set_model(model_name)
