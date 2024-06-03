@@ -117,7 +117,7 @@ The `main.py` file is the entry point of the application. It sets up the configu
 *Hotkey Creation* ![Hotkey Creation](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/hotkeycreation.png)
 
 
-*Changing Recording Mode* ![Changing Recording Mode](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ChangeRecordingMode.png)
+*Changing Recording Mode* ![Changing Recording Mode](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ChangeRecordingMode2.png)
 
 
 *Hotkey in Action* [![Hotkey in Action](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/HotKeyInAction.gif)](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/HotKeyInAction.mp4)
