@@ -1,6 +1,5 @@
-# helpers.py
-
 import os
+
 import json
 import queue
 import threading
@@ -14,12 +13,16 @@ from groq_integration import get_groq_response, send_latest_text_to_groq, update
 import gradio as gr
 from pynput.keyboard import Controller
 import keyboard  # Ensure keyboard is imported
+from langchain_community.document_loaders import WebBaseLoader, PyMuPDFLoader, TextLoader
 
 # Global variables for chat history, selected model, and dynamic URLs
 chat_history = []
 selected_model = "llama3-8b-8192"
 dynamic_urls = []
 folder_path = os.path.join('src', 'upload')  # Define folder_path globally
+
+# Path to save hotkeys
+hotkeys_path = os.path.join('src', 'hotkeys.json')
 
 class ResultThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -155,7 +158,7 @@ def on_groq_shortcut(config):
     typewrite(response, interval=config['writing_key_press_delay'])
 
 def setup_dynamic_hotkeys(config):
-    dynamic_hotkeys = {}
+    dynamic_hotkeys = load_hotkeys()
     while True:
         hotkey_name = input("Enter the name for the new hotkey (or press Enter to finish): ")
         if not hotkey_name:
@@ -175,6 +178,7 @@ def setup_dynamic_hotkeys(config):
         
         keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
         print(f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully.")
+    save_hotkeys(dynamic_hotkeys)
     return dynamic_hotkeys
 
 def handle_hotkey_action(hotkey_name, dynamic_hotkeys, config):
@@ -206,6 +210,7 @@ def create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type,
         'action_type': action_type
     }
     keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
+    save_hotkeys(dynamic_hotkeys)
     return f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully."
 
 def chat_with_bot(query, config):
@@ -221,12 +226,21 @@ def add_url(url, config):
     return f"URL '{url}' added successfully."
 
 def upload_pdf(pdf, config):
-    global retriever
-    pdf_path = os.path.join(folder_path, pdf.name)
-    with open(pdf_path, "wb") as f:
-        f.write(pdf.read())
-    retriever = setup_embedding(dynamic_urls, folder_path)
-    return f"PDF '{pdf.name}' uploaded successfully."
+    if pdf is None:
+        return "No PDF file uploaded."
+
+    try:
+        # Load the PDF using PyMuPDFLoader directly from the uploaded file object
+        loader = PyMuPDFLoader(pdf)
+        docs = loader.load()
+
+        # Add the loaded documents to the retriever
+        global retriever
+        retriever = setup_embedding(dynamic_urls, folder_path)
+
+        return f"PDF '{pdf.name}' uploaded and processed successfully."
+    except Exception as e:
+        return f"Error uploading PDF: {str(e)}"
 
 def set_model_and_retriever(model_name, config):
     global selected_model, retriever
@@ -235,8 +249,58 @@ def set_model_and_retriever(model_name, config):
     retriever = setup_embedding(dynamic_urls, folder_path)
     return f"Model set to {model_name} and retriever updated."
 
+def add_url_or_pdf(url, pdf, config):
+    if url:
+        return add_url(url, config)
+    elif pdf:
+        return upload_pdf(pdf, config)
+    else:
+        return "Please provide a URL or PDF."
+
 # New function to update JSON file
 def update_json_file(key, value):
     file_path = os.path.join('src', 'data.json')
     update_json(file_path, key, value)
     return f"Updated {key} in data.json with value: {value}"
+
+# Functions to save and load hotkeys
+def save_hotkeys(hotkeys):
+    with open(hotkeys_path, 'w') as file:
+        json.dump(hotkeys, file, indent=2)
+
+def load_hotkeys():
+    if os.path.exists(hotkeys_path):
+        with open(hotkeys_path, 'r') as file:
+            return json.load(file)
+    return {}
+
+# Function to update hotkeys
+def update_hotkey(hotkey_name, new_combination, new_post_processing, new_action_type):
+    dynamic_hotkeys = load_hotkeys()
+    if hotkey_name in dynamic_hotkeys:
+        if new_combination:
+            dynamic_hotkeys[hotkey_name]['combination'] = new_combination
+            keyboard.add_hotkey(new_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
+        if new_post_processing:
+            dynamic_hotkeys[hotkey_name]['post_processing'] = new_post_processing
+        if new_action_type:
+            dynamic_hotkeys[hotkey_name]['action_type'] = new_action_type
+        save_hotkeys(dynamic_hotkeys)  # Save the updated hotkeys
+        return f"Hotkey '{hotkey_name}' updated successfully."
+    return f"Hotkey '{hotkey_name}' not found."
+
+
+# Function to create or update hotkeys
+def create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type, dynamic_hotkeys, config):
+    dynamic_hotkeys[hotkey_name] = {
+        'combination': hotkey_combination,
+        'post_processing': post_processing,
+        'action_type': action_type
+    }
+    keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
+    save_hotkeys(dynamic_hotkeys)
+    return f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully."
+
+# Function to display current hotkeys
+def get_current_hotkeys():
+    return json.dumps(load_hotkeys(), indent=2)
