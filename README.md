@@ -114,16 +114,16 @@ The `main.py` file is the entry point of the application. It sets up the configu
 ![Gradio Interface](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/gradio_interface.png)
 *Gradio Interface*
 
-![Hotkey Creation](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/hotkey_creation.png)
+![Hotkey Creation](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/hotkeycreation.png)
 *Hotkey Creation*
 
-![Changing Recording Mode](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/changing_recording_mode.png)
+![Changing Recording Mode](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ChangeRecordingMode.png)
 *Changing Recording Mode*
 
-![Hotkey in Action](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/hotkey_in_action.png)
+![Hotkey in Action](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/HotKeyInAction.mp4)
 *Hotkey in Action*
 
-![Recording Output](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/recording_output.png)
+![Recording Output](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ctrl%2Balt%2Bspace_output.mp4)
 *Recording Output*
 
 ## Credits
