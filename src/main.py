@@ -92,40 +92,49 @@ with gr.Blocks() as demo:
         chat_button.click(lambda query: chat_with_bot(query, config), inputs=[query], outputs=[chat_output, gr.Textbox(label="Details")])
     
     with gr.Tab("Manage Hotkeys"):
-        hotkeys_list = gr.Textbox(label="Current Hotkeys", value=get_current_hotkeys(), interactive=False)
         
         with gr.Row():
             with gr.Column():
-                gr.Markdown("### Create Hotkey")
+                hotkeys_list = gr.Textbox(label="Current Hotkeys", value=get_current_hotkeys(), interactive=False)         
+            with gr.Column():
+                gr.Markdown("### Create/Update Hotkey")
                 hotkey_name = gr.Textbox(label="Hotkey Name")
-                hotkey_combination = gr.Textbox(label="Hotkey Combination (e.g., ctrl+shift+a)")
+                # hotkey_combination = gr.Textbox(label="Hotkey Combination")
+                ctrl_button = gr.Checkbox(label="Ctrl")
+                alt_button = gr.Checkbox(label="Alt")
+                shift_button = gr.Checkbox(label="Shift")
+                key_input = gr.Textbox(label="Key")
                 post_processing = gr.Textbox(label="Post-Processing Command")
                 action_type = gr.Radio(["json", "print"], label="Action Type")
                 create_button = gr.Button("Create Hotkey")
                 create_output = gr.Textbox(label="Output")
                 
-                def create_hotkey_ui(hotkey_name, hotkey_combination, post_processing, action_type):
-                    result = create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type, dynamic_hotkeys, config)
+                def create_hotkey_ui(hotkey_name, key_input, ctrl, alt, shift, post_processing, action_type):
+                    combination = '+'.join([key for key, selected in zip(['ctrl', 'alt', 'shift'], [ctrl, alt, shift]) if selected])
+                    if key_input:
+                        combination += f"+{key_input}"
+                    result = create_hotkey(hotkey_name, combination, post_processing, action_type, dynamic_hotkeys, config)
                     updated_hotkeys = get_current_hotkeys()
                     return result, updated_hotkeys
                 
-                create_button.click(create_hotkey_ui, inputs=[hotkey_name, hotkey_combination, post_processing, action_type], outputs=[create_output, hotkeys_list])
+                create_button.click(create_hotkey_ui, inputs=[hotkey_name, key_input, ctrl_button, alt_button, shift_button, post_processing, action_type], outputs=[create_output, hotkeys_list])
             
-            with gr.Column():
-                gr.Markdown("### Update Hotkey")
-                hotkey_name_edit = gr.Textbox(label="Hotkey Name to Edit")
-                new_combination = gr.Textbox(label="New Hotkey Combination (e.g., ctrl+shift+b)")
-                new_post_processing = gr.Textbox(label="New Post-Processing Command")
-                new_action_type = gr.Radio(["json", "print"], label="New Action Type")
-                update_hotkey_button = gr.Button("Update Hotkey")
-                update_hotkey_output = gr.Textbox(label="Output")
+            # with gr.Column():
+            #     gr.Markdown("### Update Hotkey")
+            #     hotkey_name_edit = gr.Textbox(label="Hotkey Name to Edit")
+            #     new_combination = gr.Textbox(label="New Hotkey Combination")
+            #     new_post_processing = gr.Textbox(label="New Post-Processing Command")
+            #     new_action_type = gr.Radio(["json", "print"], label="New Action Type")
+            #     update_hotkey_button = gr.Button("Update Hotkey")
+            #     update_hotkey_output = gr.Textbox(label="Output")
                 
-                def update_hotkey_ui(hotkey_name, new_combination, new_post_processing, new_action_type):
-                    result = update_hotkey(hotkey_name, new_combination, new_post_processing, new_action_type)
-                    updated_hotkeys = get_current_hotkeys()
-                    return result, updated_hotkeys
+            #     def update_hotkey_ui(hotkey_name, new_combination, new_post_processing, new_action_type):
+            #         result = update_hotkey(hotkey_name, new_combination, new_post_processing, new_action_type, config)
+            #         updated_hotkeys = get_current_hotkeys()
+            #         return result, updated_hotkeys
+
                 
-                update_hotkey_button.click(update_hotkey_ui, inputs=[hotkey_name_edit, new_combination, new_post_processing, new_action_type], outputs=[update_hotkey_output, hotkeys_list])
+            #     update_hotkey_button.click(update_hotkey_ui, inputs=[hotkey_name_edit, new_combination, new_post_processing, new_action_type], outputs=[update_hotkey_output, hotkeys_list])
 
         
     with gr.Tab("Add URL or PDF"):
