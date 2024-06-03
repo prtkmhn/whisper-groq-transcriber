@@ -120,11 +120,12 @@ The `main.py` file is the entry point of the application. It sets up the configu
 ![Changing Recording Mode](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ChangeRecordingMode.png)
 *Changing Recording Mode*
 
-![Hotkey in Action](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/HotKeyInAction.mp4)
+[![Hotkey in Action](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/hotkey_in_action.png)](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/HotKeyInAction.mp4)
 *Hotkey in Action*
 
-![Recording Output](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ctrl%2Balt%2Bspace_output.mp4)
+[![Recording Output](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/recording_output.png)](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ctrl%2Balt%2Bspace_output.mp4)
 *Recording Output*
+
 
 ## Credits
 
