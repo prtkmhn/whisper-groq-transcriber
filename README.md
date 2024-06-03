@@ -109,6 +109,23 @@ The `transcription.py` file contains functions for recording audio, transcribing
 
 The `main.py` file is the entry point of the application. It sets up the configuration, initializes the local model if needed, and handles the recording and transcription process. It also includes functions for setting up dynamic hotkeys and interacting with the Gradio UI.
 
+## Screenshots and Videos
+
+![Gradio Interface](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/gradio_interface.png)
+*Gradio Interface*
+
+![Hotkey Creation](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/hotkey_creation.png)
+*Hotkey Creation*
+
+![Changing Recording Mode](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/changing_recording_mode.png)
+*Changing Recording Mode*
+
+![Hotkey in Action](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/hotkey_in_action.png)
+*Hotkey in Action*
+
+![Recording Output](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/recording_output.png)
+*Recording Output*
+
 ## Credits
 
 - Original project by [savbell](https://github.com/savbell/whisper-writer).
@@ -117,5 +134,4 @@ The `main.py` file is the entry point of the application. It sets up the configu
 ## License
 
 This project is licensed under the GNU General Public License. See the [LICENSE](LICENSE) file for details.
-
-----
+```
