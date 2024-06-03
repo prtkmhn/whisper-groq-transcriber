@@ -111,23 +111,23 @@ The `main.py` file is the entry point of the application. It sets up the configu
 
 ## Screenshots and Videos
 
-*Gradio Interface* 
+- *Gradio Interface* 
 ![Gradio Interface](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/gradio_interface.png)
 
 
-*Hotkey Creation*
+- *Hotkey Creation*
  ![Hotkey Creation](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/hotkeycreation.png)
 
 
-*Changing Recording Mode*
+- *Changing Recording Mode*
  ![Changing Recording Mode](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ChangeRecordingMode2.png)
 
 
-*Hotkey in Action* 
+- *Hotkey in Action* 
 [![Hotkey in Action](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/HotKeyInAction.gif)](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/HotKeyInAction.mp4)
 
 
-*Recording Output*
+- *Recording Output*
  [![Recording Output](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ctrl%2Balt%2Bspace_output.gif)](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ctrl%2Balt%2Bspace_output.mp4)
 
 
@@ -143,4 +143,3 @@ The `main.py` file is the entry point of the application. It sets up the configu
 ## License
 
 This project is licensed under the GNU General Public License. See the [LICENSE](LICENSE) file for details.
-```
