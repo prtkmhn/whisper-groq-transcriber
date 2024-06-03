@@ -123,7 +123,7 @@ The `main.py` file is the entry point of the application. It sets up the configu
 [![Hotkey in Action](![Hotkey in Action](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/HotKeyInAction.mp4)
 *Hotkey in Action*
 
-![Recording Output]([https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ctrl%2Balt%2Bspace_output.mp4](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ctrl%2Balt%2Bspace_output.gif))
+![Recording Output](https://github.com/prtkmhn/whisper-groq-transcriber/blob/main/images/ctrl%2Balt%2Bspace_output.gif)
 *Recording Output*
 
 
