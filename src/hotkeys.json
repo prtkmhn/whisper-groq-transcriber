@@ -1,12 +1,1 @@
-{
-  "a": {
-    "combination": "ctrl+a",
-    "post_processing": "asdsd",
-    "action_type": "print"
-  },
-  "d": {
-    "combination": "ctrl+alt+d",
-    "post_processing": "saddiy it",
-    "action_type": "print"
-  }
-}
+{}

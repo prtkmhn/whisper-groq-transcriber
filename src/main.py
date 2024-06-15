@@ -10,12 +10,11 @@ import pyperclip
 from pynput import keyboard as pynput_keyboard
 from audioplayer import AudioPlayer
 from transcription import create_local_model, record_and_transcribe
-from status_window import StatusWindow
 from groq_integration import get_groq_response, send_latest_text_to_groq, update_json, set_model, setup_embedding  # Import the new Groq integration
 import gradio as gr
 from pynput.keyboard import Controller
 from helpers import (
-    ResultThread, load_config_with_defaults, clear_status_queue, stop_recording, on_shortcut, get_selected_text,
+    ResultThread, load_config_with_defaults, clear_status_queue, stop_recording, on_shortcut, on_hands_free_shortcut,
     typewrite, format_keystrokes, on_groq_shortcut, chat_with_bot, add_url, upload_pdf, set_model_and_retriever
 )
 from hotkey import setup_dynamic_hotkeys, update_hotkey, get_current_hotkeys, create_hotkey
@@ -53,17 +52,17 @@ elif config['recording_mode'] == 'press_to_toggle':
 #     print(' When it is pressed, recording will start, and will stop when you release the key combo.')
 print('Press alt+C on the terminal window to quit.')
 
-# Set up status window and keyboard listener
+# Set up status queue and keyboard listener
 status_queue = queue.Queue()
 pyinput_keyboard = Controller()
 recording_thread = None  # Initialize recording_thread
-status_window = None  # Initialize status_window
 
-keyboard.add_hotkey(config['activation_key'], lambda: on_shortcut(config, status_queue, local_model, recording_thread, status_window))
-keyboard.add_hotkey('ctrl+alt+space', lambda: on_shortcut(config, status_queue, local_model, recording_thread, status_window))  # Add new hotkey for Groq integration
+keyboard.add_hotkey(config['activation_key'], lambda: on_shortcut(config, status_queue, local_model, recording_thread))
+keyboard.add_hotkey('ctrl+alt+space', lambda: on_shortcut(config, status_queue, local_model, recording_thread))  # Add new hotkey for Groq integration
 keyboard.add_hotkey('alt+c', lambda: stop_recording(recording_thread))  # Add hotkey to stop recording
 keyboard.add_hotkey('ctrl+alt+v', lambda: on_groq_shortcut(config))  # Add hotkey to paste clipboard content
-
+keyboard.add_hotkey('ctrl+alt+f', lambda: on_hands_free_shortcut(config, status_queue, local_model, recording_thread))
+keyboard.add_hotkey('ctrl+alt+i', lambda: stop_recording(recording_thread))
 # Set up dynamic hotkeys
 dynamic_hotkeys = setup_dynamic_hotkeys(config)
 

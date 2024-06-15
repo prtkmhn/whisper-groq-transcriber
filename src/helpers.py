@@ -6,10 +6,10 @@ import queue
 import threading
 import time
 import pyperclip
+import pyttsx3
 from pynput import keyboard as pynput_keyboard
 from audioplayer import AudioPlayer
 from transcription import create_local_model, record_and_transcribe
-from status_window import StatusWindow
 from groq_integration import get_groq_response, send_latest_text_to_groq, update_json, set_model, setup_embedding
 import gradio as gr
 from pynput.keyboard import Controller
@@ -64,7 +64,8 @@ def load_config_with_defaults():
         'add_trailing_space': False,
         'remove_capitalization': False,
         'print_to_terminal': True,
-        'hide_status_window': False
+        'hide_status_window': False,
+        'speak_responses': False
     }
 
     config_path = os.path.join('src', 'config.json')
@@ -84,13 +85,18 @@ def clear_status_queue(status_queue):
         except queue.Empty:
             break
 
+def speak(text):
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
+
 def stop_recording(recording_thread):
     if recording_thread and recording_thread.is_alive():
         recording_thread.stop()
         recording_thread.join()
         print("Recording stopped.")
 
-def on_shortcut(config, status_queue, local_model, recording_thread, status_window):
+def on_shortcut(config, status_queue, local_model, recording_thread):
     clear_status_queue(status_queue)
 
     status_queue.put(('recording', 'Recording...'))
@@ -99,18 +105,9 @@ def on_shortcut(config, status_queue, local_model, recording_thread, status_wind
                                     kwargs={'config': config,
                                             'local_model': local_model if local_model and not config['use_api'] else None},)
     
-    if not config['hide_status_window']:
-        status_window = StatusWindow(status_queue)
-        status_window.recording_thread = recording_thread
-        status_window.start()
-    
     recording_thread.start()
     recording_thread.join()
     
-    if not config['hide_status_window']:
-        if status_window.is_alive():
-            status_queue.put(('cancel', ''))
-
     transcribed_text = recording_thread.result
 
     if transcribed_text:
@@ -127,16 +124,50 @@ def on_shortcut(config, status_queue, local_model, recording_thread, status_wind
 
     # Ensure the recording stops and re-enable the shortcut after Groq response
     keyboard.remove_hotkey(config['activation_key'])
-    keyboard.add_hotkey(config['activation_key'], lambda: on_shortcut(config, status_queue, local_model, recording_thread, status_window))
+    keyboard.add_hotkey(config['activation_key'], lambda: on_shortcut(config, status_queue, local_model, recording_thread))
 
-def get_selected_text():
-    with pynput_keyboard.Controller() as controller:
-        controller.press(pynput_keyboard.Key.ctrl)
-        controller.press('c')
-        controller.release('c')
-        controller.release(pynput_keyboard.Key.ctrl)
-    time.sleep(0.1)  # Wait for clipboard to update
-    return pyperclip.paste()
+def on_hands_free_shortcut(config, status_queue, local_model, recording_thread):
+    # Clear the status queue
+    clear_status_queue(status_queue)
+    
+    # Start recording and transcribing
+    recording_thread = ResultThread(target=record_and_transcribe, 
+                                        args=(status_queue,),
+                                        kwargs={'config': config,
+                                                'local_model': local_model if local_model and not config['use_api'] else None},)
+    
+    recording_thread.start()
+    recording_thread.join()
+    
+    # Process the transcribed text with the LLM
+    transcribed_text = recording_thread.result
+    if transcribed_text:
+        # Check if the transcribed text contains 'clipboard' or 'clip board'
+        if 'clipboard' in transcribed_text.lower() or 'clip board' in transcribed_text.lower():
+            clipboard_content = pyperclip.paste()
+            transcribed_text = transcribed_text.replace('clipboard', clipboard_content).replace('clip board', clipboard_content)
+        
+        # Get response from Groq API
+        groq_response = get_groq_response(transcribed_text)
+        
+        # Speak the response if desired
+        if config['speak_responses']:
+            speak(groq_response)
+        
+        # Typewrite the response if not speaking
+        else:
+            typewrite(groq_response, interval=config['writing_key_press_delay'], recording_thread=recording_thread)
+    
+    # Resume recording after speaking
+    recording_thread = ResultThread(target=record_and_transcribe, 
+                                        args=(status_queue,),
+                                        kwargs={'config': config,
+                                                'local_model': local_model if local_model and not config['use_api'] else None},)
+    recording_thread.start()
+    
+    # Ensure the recording stops and re-enable the shortcut after Groq response
+    keyboard.remove_hotkey('ctrl+alt+f')
+    keyboard.add_hotkey('ctrl+alt+f', lambda: on_hands_free_shortcut(config, status_queue, local_model, recording_thread))
 
 def typewrite(text, interval, recording_thread=None):
     pyinput_keyboard = Controller()  # Define pyinput_keyboard here

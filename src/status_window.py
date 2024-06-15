@@ -9,7 +9,9 @@ class StatusWindow(threading.Thread):
     def __init__(self, status_queue):
         threading.Thread.__init__(self)
         self.status_queue = status_queue
-        
+        self.microphone_photo = None
+        self.pencil_photo = None
+
     def schedule_check(self, func):
         if hasattr(self, 'window'):
             self.window.after(100, func)
@@ -42,14 +44,17 @@ class StatusWindow(threading.Thread):
         # Load and display the icons
         self.microphone_image = Image.open(os.path.join('assets', 'microphone.png'))
         self.microphone_image = self.microphone_image.resize((32, 32), Image.ANTIALIAS)
-        self.microphone_photo = ImageTk.PhotoImage(self.microphone_image)
-        
+        self.microphone_image = ImageTk.PhotoImage(self.microphone_image)
         self.pencil_image = Image.open(os.path.join('assets', 'pencil.png'))
         self.pencil_image = self.pencil_image.resize((32, 32), Image.ANTIALIAS)
         self.pencil_photo = ImageTk.PhotoImage(self.pencil_image)
 
-        self.icon_label = tk.Label(self.window, image=self.microphone_photo, bg='#B0C4DE')
-        self.icon_label.place(x=50, y=40, anchor='center')
+        # # Keep references to the images
+        # self.microphone_image_ref = self.microphone_image
+        # self.pencil_image_ref = self.pencil_image
+
+        # self.icon_label = tk.Label(self.window, image=self.microphone_photo, bg='#B0C4DE')
+        # self.icon_label.place(x=50, y=40, anchor='center')
 
         # Close button
         self.close_button = tk.Button(self.window, text='X', font=('Arial', 12, 'bold'), bg='#B0C4DE', 
