@@ -16,9 +16,9 @@ import gradio as gr
 from pynput.keyboard import Controller
 from helpers import (
     ResultThread, load_config_with_defaults, clear_status_queue, stop_recording, on_shortcut, get_selected_text,
-    typewrite, format_keystrokes, on_groq_shortcut, setup_dynamic_hotkeys, update_hotkey, get_current_hotkeys,
-    create_hotkey, chat_with_bot, add_url, upload_pdf, set_model_and_retriever, update_json_file
+    typewrite, format_keystrokes, on_groq_shortcut, chat_with_bot, add_url, upload_pdf, set_model_and_retriever
 )
+from hotkey import setup_dynamic_hotkeys, update_hotkey, get_current_hotkeys, create_hotkey
 
 # Global variables for chat history, selected model, and dynamic URLs
 chat_history = []
@@ -68,7 +68,6 @@ keyboard.add_hotkey('ctrl+alt+v', lambda: on_groq_shortcut(config))  # Add hotke
 dynamic_hotkeys = setup_dynamic_hotkeys(config)
 
 # Function to add URL or PDF
-# Function to add URL or PDF
 def add_url_or_pdf(url, pdf, config):
     if url:
         return add_url(url, config)
@@ -99,7 +98,6 @@ with gr.Blocks() as demo:
             with gr.Column():
                 gr.Markdown("### Create/Update Hotkey")
                 hotkey_name = gr.Textbox(label="Hotkey Name")
-                # hotkey_combination = gr.Textbox(label="Hotkey Combination")
                 ctrl_button = gr.Checkbox(label="Ctrl")
                 alt_button = gr.Checkbox(label="Alt")
                 shift_button = gr.Checkbox(label="Shift")
@@ -119,22 +117,6 @@ with gr.Blocks() as demo:
                 
                 create_button.click(create_hotkey_ui, inputs=[hotkey_name, key_input, ctrl_button, alt_button, shift_button, post_processing, action_type], outputs=[create_output, hotkeys_list])
             
-            # with gr.Column():
-            #     gr.Markdown("### Update Hotkey")
-            #     hotkey_name_edit = gr.Textbox(label="Hotkey Name to Edit")
-            #     new_combination = gr.Textbox(label="New Hotkey Combination")
-            #     new_post_processing = gr.Textbox(label="New Post-Processing Command")
-            #     new_action_type = gr.Radio(["json", "print"], label="New Action Type")
-            #     update_hotkey_button = gr.Button("Update Hotkey")
-            #     update_hotkey_output = gr.Textbox(label="Output")
-                
-            #     def update_hotkey_ui(hotkey_name, new_combination, new_post_processing, new_action_type):
-            #         result = update_hotkey(hotkey_name, new_combination, new_post_processing, new_action_type, config)
-            #         updated_hotkeys = get_current_hotkeys()
-            #         return result, updated_hotkeys
-
-                
-            #     update_hotkey_button.click(update_hotkey_ui, inputs=[hotkey_name_edit, new_combination, new_post_processing, new_action_type], outputs=[update_hotkey_output, hotkeys_list])
 
         
     with gr.Tab("Add URL or PDF"):
@@ -144,38 +126,6 @@ with gr.Blocks() as demo:
         add_url_output = gr.Textbox(label="Output")
         
         add_url_button.click(lambda url, pdf: add_url_or_pdf(url, pdf, config), inputs=[url_input, pdf_input], outputs=add_url_output)
-
-    # New tab to update JSON file
-    with gr.Tab("Update Context"):
-        json_key = gr.Textbox(label="Key", placeholder="Enter the key to update...")
-        json_value = gr.Textbox(label="Value", placeholder="Enter the value to update...")
-        update_button = gr.Button("Update JSON")
-        update_output = gr.Textbox(label="Output")
-        
-        update_button.click(update_json_file, inputs=[json_key, json_value], outputs=update_output)
-
-    # New tab for Instructions
-    with gr.Tab("Change Recording Mode"):
-        recording_mode = gr.Dropdown(["voice_activity_detection", "press_to_toggle"], label="Recording Mode", value=config["recording_mode"])
-        activation_key = gr.Textbox(label="Activation Key", value=config["activation_key"])
-        instructions_output = gr.Textbox(label="Instructions", value="", interactive=False)
-        
-        def update_instructions(recording_mode, activation_key):
-            config["recording_mode"] = recording_mode
-            config["activation_key"] = activation_key
-            instructions = f'WhisperWriter is set to record using {recording_mode}. To change this, modify the "recording_mode" value in the src\\config.json file.\n'
-            instructions += f'The activation key combo is set to {format_keystrokes(activation_key)}.\n'
-            if recording_mode == 'voice_activity_detection':
-                instructions += 'When it is pressed, recording will start, and will stop when you stop speaking.\n'
-            elif recording_mode == 'press_to_toggle':
-                instructions += 'When it is pressed, recording will start, and will stop when you press the key combo again.\n'
-            elif recording_mode == 'hold_to_record':
-                instructions += 'When it is pressed, recording will start, and will stop when you release the key combo.\n'
-            instructions += 'Press alt+C on the terminal window to quit.'
-            return instructions
-        
-        recording_mode.change(update_instructions, inputs=[recording_mode, activation_key], outputs=instructions_output)
-        activation_key.change(update_instructions, inputs=[recording_mode, activation_key], outputs=instructions_output)
 
 demo.launch()
 

@@ -1,6 +1,5 @@
-# helpers.py
-
 import os
+
 import json
 import queue
 import threading
@@ -21,6 +20,9 @@ chat_history = []
 selected_model = "llama3-8b-8192"
 dynamic_urls = []
 folder_path = os.path.join('src', 'upload')  # Define folder_path globally
+
+# Path to save hotkeys
+hotkeys_path = os.path.join('src', 'hotkeys.json')
 
 class ResultThread(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -129,6 +131,7 @@ def on_shortcut(config, status_queue, local_model, recording_thread, status_wind
     keyboard.remove_hotkey(config['activation_key'])
     keyboard.add_hotkey(config['activation_key'], lambda: on_shortcut(config, status_queue, local_model, recording_thread, status_window))
 
+# Function to capture selected text
 def get_selected_text():
     with pynput_keyboard.Controller() as controller:
         controller.press(pynput_keyboard.Key.ctrl)
@@ -154,8 +157,61 @@ def on_groq_shortcut(config):
     response = send_latest_text_to_groq()
     typewrite(response, interval=config['writing_key_press_delay'])
 
+def setup_dynamic_hotkeys(config):
+    dynamic_hotkeys = load_hotkeys()
+    while True:
+        hotkey_name = input("Enter the name for the new hotkey (or press Enter to finish): ")
+        if not hotkey_name:
+            break
+        hotkey_combination = input(f"Enter the hotkey combination for '{hotkey_name}' (or press Enter to skip): ")
+        if not hotkey_combination:
+            print(f"Skipping '{hotkey_name}'")
+            continue
+        post_processing = input(f"Enter the post-processing command for '{hotkey_name}' (or press Enter to skip): ")
+        action_type = input(f"Do you want to save the output to JSON or print it directly? (Enter 'json' or 'print'): ").strip().lower()
+        
+        dynamic_hotkeys[hotkey_name] = {
+            'combination': hotkey_combination,
+            'post_processing': post_processing,
+            'action_type': action_type
+        }
+        
+        keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
+        print(f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully.")
+    save_hotkeys(dynamic_hotkeys)
+    return dynamic_hotkeys
+
+def handle_hotkey_action(hotkey_name, dynamic_hotkeys, config):
+    clipboard_content = pyperclip.paste()
+    post_processing_command = dynamic_hotkeys[hotkey_name]['post_processing']
+    action_type = dynamic_hotkeys[hotkey_name]['action_type']
+    
+    if post_processing_command:
+        query = f"{post_processing_command} {clipboard_content}"
+    else:
+        query = clipboard_content
+    
+    response = generate_answer(query)
+    
+    if action_type == 'json':
+        update_json(os.path.join('src', 'data.json'), hotkey_name, response)
+        print(f"Saved response to '{hotkey_name}' in data.json")
+    else:
+        typewrite(response, interval=config['writing_key_press_delay'])
+
 def generate_answer(query):
     return get_groq_response(query)
+
+# Gradio UI functions
+def create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type, dynamic_hotkeys, config):
+    dynamic_hotkeys[hotkey_name] = {
+        'combination': hotkey_combination,
+        'post_processing': post_processing,
+        'action_type': action_type
+    }
+    keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
+    save_hotkeys(dynamic_hotkeys)
+    return f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully."
 
 def chat_with_bot(query, config):
     global chat_history
@@ -200,3 +256,54 @@ def add_url_or_pdf(url, pdf, config):
         return upload_pdf(pdf, config)
     else:
         return "Please provide a URL or PDF."
+
+# New function to update JSON file
+def update_json_file(key, value):
+    file_path = os.path.join('src', 'data.json')
+    update_json(file_path, key, value)
+    return f"Updated {key} in data.json with value: {value}"
+
+# Functions to save and load hotkeys
+def save_hotkeys(hotkeys):
+    with open(hotkeys_path, 'w') as file:
+        json.dump(hotkeys, file, indent=2)
+
+def load_hotkeys():
+    if os.path.exists(hotkeys_path):
+        with open(hotkeys_path, 'r') as file:
+            return json.load(file)
+    return {}
+
+# Function to update hotkeys
+def update_hotkey(hotkey_name, new_combination, new_post_processing, new_action_type, config):
+    dynamic_hotkeys = load_hotkeys()
+    if hotkey_name in dynamic_hotkeys:
+        if new_combination:
+            dynamic_hotkeys[hotkey_name]['combination'] = new_combination
+            keyboard.add_hotkey(new_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
+        if new_post_processing:
+            dynamic_hotkeys[hotkey_name]['post_processing'] = new_post_processing
+        if new_action_type:
+            dynamic_hotkeys[hotkey_name]['action_type'] = new_action_type
+        save_hotkeys(dynamic_hotkeys)  # Save the updated hotkeys
+        return f"Hotkey '{hotkey_name}' updated successfully."
+    return f"Hotkey '{hotkey_name}' not found."
+
+
+
+
+
+# Function to create or update hotkeys
+def create_hotkey(hotkey_name, hotkey_combination, post_processing, action_type, dynamic_hotkeys, config):
+    dynamic_hotkeys[hotkey_name] = {
+        'combination': hotkey_combination,
+        'post_processing': post_processing,
+        'action_type': action_type
+    }
+    keyboard.add_hotkey(hotkey_combination, lambda name=hotkey_name: handle_hotkey_action(name, dynamic_hotkeys, config))
+    save_hotkeys(dynamic_hotkeys)
+    return f"Hotkey '{hotkey_combination}' for '{hotkey_name}' set up successfully."
+
+# Function to display current hotkeys
+def get_current_hotkeys():
+    return json.dumps(load_hotkeys(), indent=2)
